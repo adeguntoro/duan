@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Models\Duan;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+
 class DuanFactory extends Factory
 {
     /**
@@ -23,6 +24,9 @@ class DuanFactory extends Factory
     {
         return [
             //
+            'name' => $this->faker->name,
+            'email' => $this->faker->unique()->safeEmail,
+            'alamat' => $this->faker->address
         ];
     }
 }

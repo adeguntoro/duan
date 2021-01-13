@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Duan;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class DuanController extends Controller
 {
@@ -15,6 +17,8 @@ class DuanController extends Controller
     public function index()
     {
         //
+        $data = Duan::all();
+        return view('duan.index', ['datas' => $data ] );
     }
 
     /**
@@ -25,6 +29,7 @@ class DuanController extends Controller
     public function create()
     {
         //
+        return view('duan.create');
     }
 
     /**
@@ -36,6 +41,25 @@ class DuanController extends Controller
     public function store(Request $request)
     {
         //
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|max:255',
+            'email' => 'required|email',
+            'alamat' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return back()->withErrors($validator)->withInput();
+        }
+
+        $flight = new Duan;
+
+        $flight->name = $request->name;
+        $flight->email = $request->email;
+        $flight->alamat = $request->alamat;
+
+        $flight->save();
+
+        return redirect('/data')->with('status', 'User '.$request->name.' telah ditambahkan');
     }
 
     /**
@@ -44,9 +68,11 @@ class DuanController extends Controller
      * @param  \App\Models\Duan  $duan
      * @return \Illuminate\Http\Response
      */
-    public function show(Duan $duan)
+    public function show($id)
     {
         //
+        $data = Duan::findorfail($id); //Jika data tidak ada, akan error 404
+        return view('duan.view', ['user' => $data ] );
     }
 
     /**
@@ -55,9 +81,11 @@ class DuanController extends Controller
      * @param  \App\Models\Duan  $duan
      * @return \Illuminate\Http\Response
      */
-    public function edit(Duan $duan)
+    public function edit($id)
     {
         //
+        $data = Duan::findorfail($id); //Jika data tidak ada, akan error 404
+        return view('duan.edit', ['user' => $data ] );
     }
 
     /**
@@ -67,9 +95,30 @@ class DuanController extends Controller
      * @param  \App\Models\Duan  $duan
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Duan $duan)
+    public function update(Request $request, $id)
     {
         //
+
+        // return response()->json($request->all());
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|max:255',
+            'email' => 'required|email',
+            'alamat' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return back()->withErrors($validator)->withInput();
+        }
+
+        $flight = Duan::find($id);
+
+        $flight->name = $request->name;
+        $flight->email = $request->email;
+        $flight->alamat = $request->alamat;
+
+        $flight->save();
+
+        return redirect('/data')->with('status', 'User '.$id.' telah diupdate');
     }
 
     /**
@@ -78,8 +127,11 @@ class DuanController extends Controller
      * @param  \App\Models\Duan  $duan
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Duan $duan)
+    public function destroy($id)
     {
         //
+        Duan::destroy($id);
+        // return view('duan.index')->with('status', 'User Dihapus!');
+        return redirect('/data')->with('status', 'Contact deleted!');
     }
 }
